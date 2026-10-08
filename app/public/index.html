@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TF Companion</title>
+<style>
+  :root { --bg:#f6f7f9; --fg:#1b1f24; --card:#fff; --muted:#667; --accent:#2a6fdb; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14171b; --fg:#e6e8eb; --card:#1d2227; --muted:#9aa; --accent:#6aa2ff; } }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--fg); font:15px system-ui, sans-serif; max-width:760px; margin-inline:auto; }
+  section { background:var(--card); border-radius:10px; padding:16px; margin-bottom:16px; }
+  h1,h2 { margin:0 0 12px; } h2 { font-size:17px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; }
+  .stat b { display:block; font-size:22px; } .stat span, label { color:var(--muted); font-size:13px; }
+  label { display:block; margin-bottom:8px; } input { width:100%; box-sizing:border-box; padding:6px; font:inherit; }
+  #out { margin-top:12px; font-size:17px; } .muted { color:var(--muted); }
+</style>
+</head>
+<body>
+<h1>TF Companion</h1>
+
+<section>
+  <h2>Live game data</h2>
+  <div id="live" class="muted">Waiting for data from the exporter mod…</div>
+</section>
+
+<section>
+  <h2>Line profit calculator</h2>
+  <div class="grid">
+    <label>Cargo/passengers per trip<input id="load" type="number" value="40"></label>
+    <label>Income per unit<input id="rate" type="number" value="25"></label>
+    <label>Round-trip time (days)<input id="days" type="number" value="30"></label>
+    <label>Running cost per year<input id="cost" type="number" value="8000"></label>
+    <label>Vehicles<input id="count" type="number" value="4"></label>
+  </div>
+  <div id="out"></div>
+</section>
+
+<script>
+const fmt = n => n == null ? '–' : Number(n).toLocaleString();
+
+function calc() {
+  const v = id => Number(document.getElementById(id).value) || 0;
+  const tripsPerYear = v('days') > 0 ? 365 / v('days') : 0;
+  // Income counts the loaded leg only; running cost is per vehicle.
+  const perVehicle = tripsPerYear * v('load') * v('rate') - v('cost');
+  document.getElementById('out').textContent =
+    `Profit per vehicle/year: ${fmt(Math.round(perVehicle))} · line total: ${fmt(Math.round(perVehicle * v('count')))}`;
+}
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', calc));
+calc();
+
+async function refresh() {
+  try {
+    const snaps = await (await fetch('/api/snapshots')).json();
+    const s = snaps[snaps.length - 1];
+    if (!s) return;
+    const stat = (label, val) => `<div class="stat"><b>${fmt(val)}</b><span>${label}</span></div>`;
+    document.getElementById('live').className = 'grid';
+    document.getElementById('live').innerHTML =
+      stat('Money', s.money) + stat('Lines', s.lines) + stat('Vehicles', s.vehicles) +
+      stat('Towns', s.towns) + stat('Game time', s.gameTime);
+  } catch {}
+}
+refresh(); setInterval(refresh, 3000);
+</script>
+</body>
+</html>
