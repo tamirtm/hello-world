@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Google Drive helper. Remote "gdrive:" is rooted at My Drive/ClaudeCode (root_folder_id).
+#   drive pull     Drive context/  -> ~/drive/context   (one-way mirror, read-only cache)
+#   drive inbox    Drive inbox/    -> ~/drive/inbox     (copy, never deletes)
+#   drive push     ~/drive/outputs -> Drive outputs/    (copy, never deletes on Drive)
+#   drive ls [p]   list a Drive path
+set -euo pipefail
+L="$HOME/drive"; R="gdrive:"
+OPTS=(--drive-export-formats docx,xlsx,pptx,pdf --exclude ".~*" --stats-one-line -P)
+mkdir -p "$L"/{context,inbox,outputs}
+case "${1:-}" in
+  pull)  rclone sync "${R}context" "$L/context" "${OPTS[@]}" ;;
+  inbox) rclone copy "${R}inbox"   "$L/inbox"   "${OPTS[@]}" ;;
+  push)  rclone copy "$L/outputs"  "${R}outputs" "${OPTS[@]}" ;;
+  ls)    rclone lsf "${R}${2:-}" ;;
+  *) sed -n '2,7p' "$0"; exit 1 ;;
+esac

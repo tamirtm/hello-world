@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Headless teammate run with a per-run budget and a daily cap.
+#   teammate-run <job-dir> "<prompt>"
+# Env: PER_RUN_USD (default 1), DAILY_CAP_USD (default 5), MAX_TURNS (default 40)
+# Spend is logged to ~/.claude/spend.log as: date,usd,job
+set -euo pipefail
+job=$(realpath "$1"); prompt=$2
+PER_RUN_USD=${PER_RUN_USD:-1}; DAILY_CAP_USD=${DAILY_CAP_USD:-5}; MAX_TURNS=${MAX_TURNS:-40}
+log="$HOME/.claude/spend.log"; today=$(date +%F); touch "$log"
+spent=$(awk -F, -v d="$today" '$1==d{s+=$2} END{printf "%.4f", s+0}' "$log")
+if awk -v s="$spent" -v c="$DAILY_CAP_USD" 'BEGIN{exit !(s>=c)}'; then
+  echo "Daily cap reached: \$$spent of \$$DAILY_CAP_USD today. Not running." >&2; exit 3
+fi
+cd "$job"
+out=$(claude -p "$prompt" --output-format json --max-turns "$MAX_TURNS" \
+      --max-budget-usd "$PER_RUN_USD" --permission-mode acceptEdits) || true
+cost=$(jq -r '.total_cost_usd // 0' <<<"$out")
+echo "$today,$cost,$(basename "$job")" >> "$log"
+jq -r '.result // .' <<<"$out"
+echo "--- run cost \$$cost | today \$$(awk -v a="$spent" -v b="$cost" 'BEGIN{printf "%.2f", a+b}') / \$$DAILY_CAP_USD" >&2
