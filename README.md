@@ -1,3 +1,12 @@
+# hello-world
+
+Two separate projects live here for now:
+
+- **[Tab](tab/)** — friend wager tracker (Expo + TypeScript). Phase 0, the odds calculator, is built and awaiting review.
+- **Glide** — a small browser puzzle game, described below.
+
+---
+
 # Glide
 
 A small puzzle game for the browser. Slide the puck — it keeps going until it

@@ -1,4 +1,6 @@
-# Decisions
+# Decisions (Glide)
+
+> Decisions for the Tab wager app are in [tab/DECISIONS.md](tab/DECISIONS.md).
 
 Choices I made on my own while you were away, with the reasoning, so you can
 overrule any of them. Each has a **Revisit if** line saying what would change my mind.

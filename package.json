@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "test": "node --test",
+    "test": "node --test \"test/*.test.js\"",
     "e2e": "node scripts/e2e.mjs"
   },
   "engines": { "node": ">=20" }
