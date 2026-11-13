@@ -12,12 +12,15 @@ export function loadSave() {
     const raw = globalThis.localStorage?.getItem(KEY);
     if (!raw) return defaultSave();
     const data = JSON.parse(raw);
-    const base = defaultSave();
+    const posInt = (v) => (Number.isInteger(v) && v >= 1 ? v : 1);
+    const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+    const level = posInt(data.level);
     return {
-      level: Number.isInteger(data.level) && data.level >= 1 ? data.level : base.level,
-      unlocked: Number.isInteger(data.unlocked) && data.unlocked >= 1 ? data.unlocked : base.unlocked,
-      best: data.best && typeof data.best === 'object' ? data.best : {},
-      daily: data.daily && typeof data.daily === 'object' ? data.daily : {},
+      level,
+      // The current level is always playable, even if `unlocked` was lost or corrupted.
+      unlocked: Math.max(posInt(data.unlocked), level),
+      best: obj(data.best),
+      daily: obj(data.daily),
     };
   } catch {
     return defaultSave();

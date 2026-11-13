@@ -280,6 +280,8 @@ function onWin() {
   el.winShare.hidden = !daily;
   el.winShare.textContent = 'Share';
   el.winNext.textContent = daily ? 'Play levels' : 'Next level';
+  // Shown if the dialog is dismissed with Esc, so the solved board is not a dead end.
+  setStatus(daily ? 'Solved. Restart to try for fewer moves.' : 'Cleared. Press › for the next level.');
   el.win.showModal();
   el.winNext.focus();
 }

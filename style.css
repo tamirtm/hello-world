@@ -72,7 +72,9 @@ button.primary { background: var(--accent); color: var(--bg); border-color: tran
 .board {
   --w: 6; --h: 6;
   position: relative;
-  width: 100%;
+  /* Never taller than the screen: on short/landscape viewports the board shrinks. */
+  width: min(100%, max(220px, (100dvh - 250px) * var(--w) / var(--h)));
+  align-self: center;
   aspect-ratio: var(--w) / var(--h);
   background: var(--panel);
   border-radius: 14px;

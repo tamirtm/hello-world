@@ -67,4 +67,16 @@ These are the ones I could not or should not settle alone.
 
 - **Pass 1** (after first playable build): gems overlapping pads → fixed (15); removed a
   no-op event handler; added offline support and its guard test.
-- **Pass 2**: see the bottom of this file once written.
+- **Pass 2** (checked dark mode, phone landscape and desktop in a real browser):
+  - The board could be taller than the screen on a phone held sideways → it now shrinks to fit.
+    In landscape the Undo/Restart/Hint buttons still sit below the fold (one short scroll);
+    a side-by-side landscape layout is the proper fix and is not done.
+  - A corrupted save could leave the current level locked → saves are now sanitised, with tests.
+  - Dismissing the win dialog with Esc left no cue about what to do next → status line now says.
+
+## Known gaps
+
+- Screen-reader users get labelled controls and status messages, but the board itself is
+  not described cell by cell.
+- No sound, no level-select grid, no hand-made tutorial levels.
+- Only checked in Chromium; Safari and Firefox are untested.
