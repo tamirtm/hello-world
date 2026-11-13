@@ -1,0 +1,13 @@
+{
+  "name": "glide",
+  "version": "0.1.0",
+  "description": "Glide — a slide-until-you-stop puzzle game with generated levels and a daily puzzle",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test",
+    "e2e": "node scripts/e2e.mjs"
+  },
+  "engines": { "node": ">=20" }
+}
